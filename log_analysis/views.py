@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import LogEvent
-from .parse.parsing import parsing_logs
+from .parse.parsing import parsing_logs, normalize_csv_log
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from logs_receiver import receive_log
@@ -17,15 +17,15 @@ def receive_logs(request):
         if content_type == 'application/json':
             # Parse the log data using the JSON log parser
             parsed_log_dat = parse_json_log(log_file)
+            parsing_logs(parsed_log_dat)
         elif content_type == 'text/csv':
             parsed_log_dat = parse_csv_log(log_file)
+            normalize_csv_log(parsed_log_dat)
         else:
             return HttpResponse(status=400)
 
         if parsed_log_dat is None:
             return HttpResponse(status=400)
-
-
 
         return HttpResponse(status=200)
     else:

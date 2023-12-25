@@ -1,8 +1,8 @@
 import json
 import csv
-def parse_json_log(log_data):
+def parse_json_log(log_file):
     try:
-        parsed_data = json.loads(log_data)
+        parsed_data = json.loads(log_file)
         if validate_log(parsed_data):
             return parsed_data
         else:
@@ -28,9 +28,9 @@ def validate_log(parsed_data):
 
 
 
-def parse_csv_log(csv_data):
+def parse_csv_log(log_file):
     parsed_data = []
-    reader = csv.reader(csv_data.splitlines())
+    reader = csv.reader(log_file.splitlines())
     headers = next(reader)  # Assume the first row contains the column headers
 
     for row in reader:
