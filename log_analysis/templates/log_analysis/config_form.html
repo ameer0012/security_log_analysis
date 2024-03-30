@@ -1,0 +1,18 @@
+
+
+{% block content %}
+  <h1>Edit Configuration</h1>
+  <h2>Add New Rule</h2>
+  <form method="POST" action="{% url 'log_analysis:edit_config' %}">
+    {% csrf_token %}
+    {{ add_form.as_p }}
+    <button type="submit" name="add_rule">Add Rule</button>
+  </form>
+  <hr>
+  <h2>Existing Rules</h2>
+  <form method="POST" action="{% url 'log_analysis:edit_config' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+{% endblock %}

@@ -15,14 +15,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+
+import log_analysis.logs_receiver
 from . import log_receiver
-from django.urls import path
+from django.urls import path,include
 from log_analysis import views
 
 urlpatterns = [
+
+    path('admin/', admin.site.urls),
+
+    path('log_analysis/', include('log_analysis.urls')),
+    path('receive-syslog/', views.receive_syslog, name='receive_syslog'),
     path('logs/', views.log_list, name='log_list'),
-    path('receive-syslog/', log_receiver.receive_syslog, name='receive_syslog'),
-    path('receive-logs/', log_receiver.receive_logs, name='receive_logs')
+
+    #path('receive-syslog/', log_receiver.receive_syslog, name='receive_syslog'),
+    path('receive_logs/', views.receive_logs, name='receive_logs'),
+    path('', views.index, name='index'),
+
 ]
 #urlpatterns = [
  #   path('admin/', admin.site.urls),

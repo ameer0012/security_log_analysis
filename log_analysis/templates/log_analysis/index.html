@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+    {% block content %}
+      <h1>Log Parsing Rules</h1>
+      <ul>
+        {% for rule in rules %}
+          <li>{{ rule }}</li>
+        {% empty %}
+          <li>No rules found.</li>
+        {% endfor %}
+      </ul>
+      <a href="{% url 'log_analysis:edit_config' %}">Edit Configuration</a>
+    {% endblock %}
+</body>
+</html>

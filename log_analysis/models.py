@@ -1,9 +1,30 @@
 # Create your models here.
 from django.db import models
+import yaml
+
+
+class LogParsingRule(models.Model):
+    log_source_type = models.CharField(max_length=100)
+    required_fields = models.TextField()
+    parsing_patterns = models.TextField()
+    objects = models.Manager(),
+
+    def __str__(self):
+        return self.log_source_type
+
+    @classmethod
+    def load_from_config(cls):
+        with open('log_analysis/config.yaml', 'r') as f:
+            config = yaml.safe_load(f)
+        for rule_data in config:
+            cls(log_source_type=rule_data['log_source_type'],
+                required_fields=','.join(rule_data['required_fields']),
+                parsing_patterns=','.join(rule_data['parsing_patterns'])
+                ).save()
 
 
 class LogEvent(models.Model):
-    timestamp = models.DateTimeField(),
+    timestamp = models.DateTimeField(auto_now_add=True),
     level = models.CharField(max_length=50),
     user_id = models.IntegerField(null=True),
     user_name = models.CharField(max_length=100, null=True),
@@ -11,7 +32,7 @@ class LogEvent(models.Model):
     tags = models.TextField(null=True),
     source = models.CharField(max_length=100),
     objects = models.Manager(),
-    message = models.TextField()
+    message = models.TextField(default="null")
 
     def __str__(self):
         return f"LogEvent: {self.timestamp} - {self.level}"

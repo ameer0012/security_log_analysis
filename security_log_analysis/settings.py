@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'log_analysis',
+
+
 ]
 
 MIDDLEWARE = [
@@ -83,12 +85,8 @@ WSGI_APPLICATION = 'security_log_analysis.wsgi.application'
 # Database settings...
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': '<your_database_name>',
-        'USER': '<your_database_username>',
-        'PASSWORD': '<your_database_password>',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -133,22 +131,53 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
+import logging
+from logging.handlers import SysLogHandler
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'standard': {
+            'format' : "[security_log_analysis] [%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        }
+    },
     'handlers': {
-        'syslog': {
-            'class': 'django_syslog_logging.handlers.SyslogHandler',
-            'facility': 'local7',
-            'address': '/dev/log',
+        'console': {
+            'class': 'logging.StreamHandler',
         },
+        'syslog': {
+            'class': 'logging.handlers.SysLogHandler',
+            'formatter': 'standard',
+            'facility': 'local7',
+            # uncomment next line if rsyslog works with unix socket only (UDP reception disabled)
+            'address': ('localhost', 514),
+        }
     },
     'loggers': {
-        '': {
+        'django':{
             'handlers': ['syslog'],
-            'level': 'DEBUG',  # Adjust the log level as needed
-            'propagate': True,
+            'level': 'INFO',
+            'disabled': False,
+            'propagate': True
         },
-    },
+        'log_analysis': {
+                    'handlers': ['syslog'],
+                    'level': 'DEBUG',
+                    'propagate': True,
+                },
+    }
 }
+
+# loggers for my apps, uses INSTALLED_APPS in settings
+# each app must have a configured logger
+# level can be changed as desired: DEBUG, INFO, WARNING...
+MY_LOGGERS = {}
+for app in INSTALLED_APPS:
+    MY_LOGGERS[app] = {
+        'handlers': ['syslog'],
+        'level': 'DEBUG',
+        'propagate': True,
+    }
+LOGGING['loggers'].update(MY_LOGGERS)

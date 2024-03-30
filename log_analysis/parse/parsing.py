@@ -1,8 +1,9 @@
-from parsers import parse_json_log, parse_csv_log, validate_log
+
+from log_analysis.parse.parsers import parse_json_log, validate_log
 from log_analysis.models import LogEvent
 from datetime import datetime
 def parsing_logs(log_data):
-    parsed_data = parse_json_log(log_data)
+    parsed_data = log_data
 
     if parsed_data is not None:
         Log = LogEvent(
